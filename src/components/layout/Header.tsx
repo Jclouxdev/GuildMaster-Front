@@ -11,6 +11,7 @@ export default function Header() {
   const navigation = [
     { name: 'Accueil', href: '/' },
     { name: 'Raids', href: '/raids' },
+    { name: 'Mes Personnages', href: '/characters' },
     { name: 'Calendrier', href: '/raids/calendar' },
     { name: 'Roster', href: '/roster' },
     { name: 'Notifications', href: '/notifications' },
@@ -37,21 +38,32 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActivePath(item.href)
-                    ? 'bg-blue-600 text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
+                    <div className="hidden md:flex space-x-8">
+            <Link 
+              href="/raids" 
+              className={`${pathname === '/raids' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
+            >
+              Raids
+            </Link>
+            <Link 
+              href="/characters" 
+              className={`${pathname === '/characters' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
+            >
+              Mes Personnages
+            </Link>
+            <Link 
+              href="/roster" 
+              className={`${pathname === '/roster' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
+            >
+              Roster
+            </Link>
+            <Link 
+              href="/notifications" 
+              className={`${pathname === '/notifications' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
+            >
+              Notifications
+            </Link>
+          </div>
 
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
