@@ -1,4 +1,4 @@
-import { Raid, RaidRegistration, Character, User, WowClass, WowSpec, MasteryLevel } from '@/types/raid';
+import { Raid, RaidRegistration, RaidParticipant, Character, User, WowClass, WowSpec, MasteryLevel } from '@/types/raid';
 
 // Référentiel des classes et spécialisations WoW
 export const WOW_CLASSES_DATA: Record<WowClass, { name: string; specs: { name: WowSpec; role: 'Tank' | 'Healer' | 'DPS' }[] }> = {
@@ -370,6 +370,62 @@ export const mockRaidRegistrations: RaidRegistration[] = [
   }
 ];
 
+// Mock raid participants (derived from registrations)
+export const mockRaidParticipants: RaidParticipant[] = [
+  {
+    id: '1',
+    raidId: '1',
+    playerId: '1',
+    playerName: 'John Doe',
+    characterId: '1',
+    characterName: 'Thorgar',
+    characterClass: 'Warrior',
+    characterLevel: 80,
+    role: 'Tank',
+    status: 'Confirmed',
+    joinedAt: new Date('2025-08-15T12:00:00')
+  },
+  {
+    id: '2',
+    raidId: '1',
+    playerId: '2',
+    playerName: 'Jane Smith',
+    characterId: '3',
+    characterName: 'Frostmage',
+    characterClass: 'Mage',
+    characterLevel: 80,
+    role: 'DPS',
+    status: 'Confirmed',
+    joinedAt: new Date('2025-08-15T13:30:00')
+  },
+  {
+    id: '3',
+    raidId: '1',
+    playerId: '3',
+    playerName: 'Bob Wilson',
+    characterId: '4',
+    characterName: 'Shadowhunt',
+    characterClass: 'Hunter',
+    characterLevel: 79,
+    role: 'DPS',
+    status: 'Tentative',
+    joinedAt: new Date('2025-08-16T09:15:00')
+  },
+  {
+    id: '4',
+    raidId: '2',
+    playerId: '2',
+    playerName: 'Jane Smith',
+    characterId: '5',
+    characterName: 'Bearform',
+    characterClass: 'Druid',
+    characterLevel: 80,
+    role: 'Tank',
+    status: 'Confirmed',
+    joinedAt: new Date('2025-08-16T15:00:00')
+  }
+];
+
 // Helper functions for mock data
 export const getRaidById = (id: string): Raid | undefined => {
   return mockRaids.find(raid => raid.id === id);
@@ -402,6 +458,19 @@ export const getUpcomingRaids = (): Raid[] => {
   return mockRaids
     .filter(raid => raid.date > now)
     .sort((a, b) => a.date.getTime() - b.date.getTime());
+};
+
+// Additional helper functions for raid participants
+export const getParticipantsByRaidId = (raidId: string): RaidParticipant[] => {
+  return mockRaidParticipants.filter(participant => participant.raidId === raidId);
+};
+
+export const getPlayerById = (playerId: string): User | undefined => {
+  return mockUsers.find(user => user.id === playerId);
+};
+
+export const getParticipantById = (participantId: string): RaidParticipant | undefined => {
+  return mockRaidParticipants.find(participant => participant.id === participantId);
 };
 
 // WoW specific data

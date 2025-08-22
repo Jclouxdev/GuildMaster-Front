@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { getRaidById, getParticipantsByRaidId, getPlayerById } from '@/lib/mockData';
+import { getRaidById, getParticipantsByRaidId } from '@/lib/mockData';
 import { Raid, RaidParticipant } from '@/types/raid';
 
 export default function RaidDetailPage() {
@@ -127,7 +127,7 @@ export default function RaidDetailPage() {
           <div className="flex justify-between items-start mb-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{raid.title}</h1>
+                <h1 className="text-3xl font-bold text-gray-900">{raid.name}</h1>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(raid.difficulty)}`}>
                   {raid.difficulty}
                 </span>
@@ -164,28 +164,19 @@ export default function RaidDetailPage() {
             </div>
             <div>
               <span className="font-medium text-gray-700">Lieu:</span>
-              <p className="text-gray-900">{raid.location}</p>
+              <p className="text-gray-900">{raid.instance}</p>
             </div>
             <div>
-              <span className="font-medium text-gray-700">Niveau requis:</span>
-              <p className="text-gray-900">{raid.requiredLevel}+</p>
+              <span className="font-medium text-gray-700">Joueurs max:</span>
+              <p className="text-gray-900">{raid.maxPlayers}</p>
             </div>
           </div>
 
-          {/* Rewards */}
-          {raid.rewards && raid.rewards.length > 0 && (
+          {/* Objective */}
+          {raid.objective && (
             <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="font-medium text-gray-700 mb-2">Récompenses:</h3>
-              <div className="flex flex-wrap gap-2">
-                {raid.rewards.map((reward, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm"
-                  >
-                    {reward}
-                  </span>
-                ))}
-              </div>
+              <h3 className="font-medium text-gray-700 mb-2">Objectif:</h3>
+              <p className="text-gray-900">{raid.objective}</p>
             </div>
           )}
         </div>
@@ -231,7 +222,6 @@ export default function RaidDetailPage() {
           {participants.length > 0 ? (
             <div className="space-y-2">
               {participants.map((participant) => {
-                const player = getPlayerById(participant.playerId);
                 return (
                   <div
                     key={participant.id}
@@ -243,11 +233,9 @@ export default function RaidDetailPage() {
                       </div>
                       <div>
                         <div className="font-medium text-gray-900">{participant.playerName}</div>
-                        {player && (
-                          <div className="text-sm text-gray-600">
-                            Niveau {player.level} {player.class}
-                          </div>
-                        )}
+                        <div className="text-sm text-gray-600">
+                          {participant.characterName} - Niveau {participant.characterLevel} {participant.characterClass}
+                        </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

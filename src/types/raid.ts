@@ -81,6 +81,20 @@ export interface RaidRegistration {
   updatedAt: Date;
 }
 
+export interface RaidParticipant {
+  id: string;
+  raidId: string;
+  playerId: string;
+  playerName: string;
+  characterId: string;
+  characterName: string;
+  characterClass: WowClass;
+  characterLevel: number;
+  role: 'Tank' | 'Healer' | 'DPS';
+  status: 'Confirmed' | 'Tentative' | 'Declined';
+  joinedAt: Date;
+}
+
 export interface User {
   id: string;
   email: string;
