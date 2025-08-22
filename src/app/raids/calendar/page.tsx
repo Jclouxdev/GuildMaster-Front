@@ -29,14 +29,6 @@ export default function RaidCalendarPage() {
       filtered = filtered.filter(raid => raid.status === filters.status);
     }
 
-    if (filters.minLevel !== undefined) {
-      filtered = filtered.filter(raid => raid.requiredLevel >= filters.minLevel!);
-    }
-
-    if (filters.maxLevel !== undefined) {
-      filtered = filtered.filter(raid => raid.requiredLevel <= filters.maxLevel!);
-    }
-
     if (filters.dateFrom) {
       filtered = filtered.filter(raid => raid.date >= filters.dateFrom!);
     }

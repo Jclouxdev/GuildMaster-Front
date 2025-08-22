@@ -1,4 +1,139 @@
-import { Raid, RaidRegistration, Character, User } from '@/types/raid';
+import { Raid, RaidRegistration, RaidParticipant, Character, User, WowClass, WowSpec, MasteryLevel } from '@/types/raid';
+
+// Référentiel des classes et spécialisations WoW
+export const WOW_CLASSES_DATA: Record<WowClass, { name: string; specs: { name: WowSpec; role: 'Tank' | 'Healer' | 'DPS' }[] }> = {
+  'Warrior': {
+    name: 'Guerrier',
+    specs: [
+      { name: 'Arms', role: 'DPS' },
+      { name: 'Fury', role: 'DPS' },
+      { name: 'Protection (Warrior)', role: 'Tank' }
+    ]
+  },
+  'Paladin': {
+    name: 'Paladin',
+    specs: [
+      { name: 'Holy', role: 'Healer' },
+      { name: 'Protection (Paladin)', role: 'Tank' },
+      { name: 'Retribution', role: 'DPS' }
+    ]
+  },
+  'Hunter': {
+    name: 'Chasseur',
+    specs: [
+      { name: 'Beast Mastery', role: 'DPS' },
+      { name: 'Marksmanship', role: 'DPS' },
+      { name: 'Survival', role: 'DPS' }
+    ]
+  },
+  'Rogue': {
+    name: 'Voleur',
+    specs: [
+      { name: 'Assassination', role: 'DPS' },
+      { name: 'Outlaw', role: 'DPS' },
+      { name: 'Subtlety', role: 'DPS' }
+    ]
+  },
+  'Priest': {
+    name: 'Prêtre',
+    specs: [
+      { name: 'Discipline', role: 'Healer' },
+      { name: 'Holy (Priest)', role: 'Healer' },
+      { name: 'Shadow', role: 'DPS' }
+    ]
+  },
+  'Shaman': {
+    name: 'Chaman',
+    specs: [
+      { name: 'Elemental', role: 'DPS' },
+      { name: 'Enhancement', role: 'DPS' },
+      { name: 'Restoration (Shaman)', role: 'Healer' }
+    ]
+  },
+  'Mage': {
+    name: 'Mage',
+    specs: [
+      { name: 'Arcane', role: 'DPS' },
+      { name: 'Fire', role: 'DPS' },
+      { name: 'Frost (Mage)', role: 'DPS' }
+    ]
+  },
+  'Warlock': {
+    name: 'Démoniste',
+    specs: [
+      { name: 'Affliction', role: 'DPS' },
+      { name: 'Demonology', role: 'DPS' },
+      { name: 'Destruction', role: 'DPS' }
+    ]
+  },
+  'Monk': {
+    name: 'Moine',
+    specs: [
+      { name: 'Brewmaster', role: 'Tank' },
+      { name: 'Mistweaver', role: 'Healer' },
+      { name: 'Windwalker', role: 'DPS' }
+    ]
+  },
+  'Druid': {
+    name: 'Druide',
+    specs: [
+      { name: 'Balance', role: 'DPS' },
+      { name: 'Feral', role: 'DPS' },
+      { name: 'Guardian', role: 'Tank' },
+      { name: 'Restoration (Druid)', role: 'Healer' }
+    ]
+  },
+  'Demon Hunter': {
+    name: 'Chasseur de démons',
+    specs: [
+      { name: 'Havoc', role: 'DPS' },
+      { name: 'Vengeance', role: 'Tank' }
+    ]
+  },
+  'Death Knight': {
+    name: 'Chevalier de la mort',
+    specs: [
+      { name: 'Blood', role: 'Tank' },
+      { name: 'Frost (DK)', role: 'DPS' },
+      { name: 'Unholy', role: 'DPS' }
+    ]
+  },
+  'Evoker': {
+    name: 'Évocateur',
+    specs: [
+      { name: 'Devastation', role: 'DPS' },
+      { name: 'Preservation', role: 'Healer' },
+      { name: 'Augmentation', role: 'DPS' }
+    ]
+  }
+};
+
+export const MASTERY_LEVELS: { value: MasteryLevel; label: string; description: string; color: string }[] = [
+  { 
+    value: 'Débutant', 
+    label: 'Débutant', 
+    description: 'Découverte de la spécialisation',
+    color: 'bg-gray-100 text-gray-800'
+  },
+  { 
+    value: 'Intermédiaire', 
+    label: 'Intermédiaire', 
+    description: 'Bases maîtrisées, en apprentissage',
+    color: 'bg-blue-100 text-blue-800'
+  },
+  { 
+    value: 'Avancé', 
+    label: 'Avancé', 
+    description: 'Bonne maîtrise, capable de raids difficiles',
+    color: 'bg-purple-100 text-purple-800'
+  },
+  { 
+    value: 'Expert', 
+    label: 'Expert', 
+    description: 'Maîtrise parfaite, peut guider les autres',
+    color: 'bg-orange-100 text-orange-800'
+  }
+];
 
 // Mock users data
 export const mockUsers: User[] = [
@@ -39,10 +174,15 @@ export const mockCharacters: Character[] = [
     name: 'Thorgar',
     level: 80,
     class: 'Warrior',
-    spec: 'Protection',
     itemLevel: 480,
-    role: 'Tank',
+    specializations: [
+      { spec: 'Protection (Warrior)', masteryLevel: 'Expert', isPreferred: true },
+      { spec: 'Arms', masteryLevel: 'Avancé', isPreferred: false }
+    ],
+    primaryRole: 'Tank',
     isMain: true,
+    server: 'Hyjal',
+    notes: 'Disponible tous les soirs sauf mercredi',
     createdAt: new Date('2025-01-01'),
     updatedAt: new Date('2025-08-15')
   },
@@ -52,10 +192,14 @@ export const mockCharacters: Character[] = [
     name: 'Healbot',
     level: 78,
     class: 'Priest',
-    spec: 'Holy',
     itemLevel: 470,
-    role: 'Healer',
+    specializations: [
+      { spec: 'Holy (Priest)', masteryLevel: 'Avancé', isPreferred: true },
+      { spec: 'Discipline', masteryLevel: 'Intermédiaire', isPreferred: false }
+    ],
+    primaryRole: 'Healer',
     isMain: false,
+    server: 'Hyjal',
     createdAt: new Date('2025-02-01'),
     updatedAt: new Date('2025-08-10')
   },
@@ -65,10 +209,16 @@ export const mockCharacters: Character[] = [
     name: 'Frostmage',
     level: 80,
     class: 'Mage',
-    spec: 'Frost',
     itemLevel: 485,
-    role: 'DPS',
+    specializations: [
+      { spec: 'Frost (Mage)', masteryLevel: 'Expert', isPreferred: true },
+      { spec: 'Fire', masteryLevel: 'Avancé', isPreferred: false },
+      { spec: 'Arcane', masteryLevel: 'Intermédiaire', isPreferred: false }
+    ],
+    primaryRole: 'DPS',
     isMain: true,
+    server: 'Hyjal',
+    notes: 'Préfère les combats longue portée',
     createdAt: new Date('2025-01-15'),
     updatedAt: new Date('2025-08-12')
   },
@@ -78,10 +228,14 @@ export const mockCharacters: Character[] = [
     name: 'Shadowhunt',
     level: 79,
     class: 'Hunter',
-    spec: 'Marksmanship',
     itemLevel: 475,
-    role: 'DPS',
+    specializations: [
+      { spec: 'Marksmanship', masteryLevel: 'Avancé', isPreferred: true },
+      { spec: 'Beast Mastery', masteryLevel: 'Intermédiaire', isPreferred: false }
+    ],
+    primaryRole: 'DPS',
     isMain: true,
+    server: 'Hyjal',
     createdAt: new Date('2025-02-01'),
     updatedAt: new Date('2025-08-14')
   },
@@ -91,10 +245,15 @@ export const mockCharacters: Character[] = [
     name: 'Bearform',
     level: 80,
     class: 'Druid',
-    spec: 'Guardian',
     itemLevel: 478,
-    role: 'Tank',
+    specializations: [
+      { spec: 'Guardian', masteryLevel: 'Avancé', isPreferred: true },
+      { spec: 'Balance', masteryLevel: 'Intermédiaire', isPreferred: false }
+    ],
+    primaryRole: 'Tank',
     isMain: false,
+    server: 'Hyjal',
+    notes: 'Peut aussi jouer DPS si besoin',
     createdAt: new Date('2025-03-01'),
     updatedAt: new Date('2025-08-16')
   }
@@ -211,6 +370,62 @@ export const mockRaidRegistrations: RaidRegistration[] = [
   }
 ];
 
+// Mock raid participants (derived from registrations)
+export const mockRaidParticipants: RaidParticipant[] = [
+  {
+    id: '1',
+    raidId: '1',
+    playerId: '1',
+    playerName: 'John Doe',
+    characterId: '1',
+    characterName: 'Thorgar',
+    characterClass: 'Warrior',
+    characterLevel: 80,
+    role: 'Tank',
+    status: 'Confirmed',
+    joinedAt: new Date('2025-08-15T12:00:00')
+  },
+  {
+    id: '2',
+    raidId: '1',
+    playerId: '2',
+    playerName: 'Jane Smith',
+    characterId: '3',
+    characterName: 'Frostmage',
+    characterClass: 'Mage',
+    characterLevel: 80,
+    role: 'DPS',
+    status: 'Confirmed',
+    joinedAt: new Date('2025-08-15T13:30:00')
+  },
+  {
+    id: '3',
+    raidId: '1',
+    playerId: '3',
+    playerName: 'Bob Wilson',
+    characterId: '4',
+    characterName: 'Shadowhunt',
+    characterClass: 'Hunter',
+    characterLevel: 79,
+    role: 'DPS',
+    status: 'Tentative',
+    joinedAt: new Date('2025-08-16T09:15:00')
+  },
+  {
+    id: '4',
+    raidId: '2',
+    playerId: '2',
+    playerName: 'Jane Smith',
+    characterId: '5',
+    characterName: 'Bearform',
+    characterClass: 'Druid',
+    characterLevel: 80,
+    role: 'Tank',
+    status: 'Confirmed',
+    joinedAt: new Date('2025-08-16T15:00:00')
+  }
+];
+
 // Helper functions for mock data
 export const getRaidById = (id: string): Raid | undefined => {
   return mockRaids.find(raid => raid.id === id);
@@ -243,6 +458,19 @@ export const getUpcomingRaids = (): Raid[] => {
   return mockRaids
     .filter(raid => raid.date > now)
     .sort((a, b) => a.date.getTime() - b.date.getTime());
+};
+
+// Additional helper functions for raid participants
+export const getParticipantsByRaidId = (raidId: string): RaidParticipant[] => {
+  return mockRaidParticipants.filter(participant => participant.raidId === raidId);
+};
+
+export const getPlayerById = (playerId: string): User | undefined => {
+  return mockUsers.find(user => user.id === playerId);
+};
+
+export const getParticipantById = (participantId: string): RaidParticipant | undefined => {
+  return mockRaidParticipants.find(participant => participant.id === participantId);
 };
 
 // WoW specific data

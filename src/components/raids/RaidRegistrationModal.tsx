@@ -15,7 +15,6 @@ interface RaidRegistrationModalProps {
 export default function RaidRegistrationModal({
   isOpen,
   onClose,
-  raidId,
   raidName,
   userCharacters,
   onRegister
@@ -149,7 +148,7 @@ export default function RaidRegistrationModal({
                                 )}
                               </div>
                               <div className="text-sm text-gray-600">
-                                Niveau {character.level} {character.spec && `${character.spec} `}{character.class}
+                                Niveau {character.level} {character.specializations[0]?.spec && `${character.specializations[0].spec} `}{character.class}
                               </div>
                             </div>
                           </div>
@@ -158,8 +157,8 @@ export default function RaidRegistrationModal({
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getClassColor(character.class)}`}>
                               {character.class}
                             </span>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(character.role)}`}>
-                              {character.role}
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleColor(character.primaryRole)}`}>
+                              {character.primaryRole}
                             </span>
                             {character.itemLevel && (
                               <span className="text-sm text-gray-600">
