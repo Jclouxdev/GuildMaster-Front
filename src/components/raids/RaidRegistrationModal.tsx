@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Character } from '@/types/raid';
+import { useNotifications } from '../providers/NotificationProvider';
 
 interface RaidRegistrationModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ export default function RaidRegistrationModal({
   userCharacters,
   onRegister
 }: RaidRegistrationModalProps) {
+  const { addNotification } = useNotifications();
   const [selectedCharacters, setSelectedCharacters] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -40,11 +42,33 @@ export default function RaidRegistrationModal({
     setIsLoading(true);
     try {
       await onRegister(selectedCharacters, notes);
+      
+      // Notification de succès
+      addNotification({
+        type: 'registration',
+        title: 'Inscription confirmée !',
+        message: `Vous êtes maintenant inscrit(e) au raid "${raidName}"`
+      });
+
+      // Simulation d'une mise à jour en temps réel
+      setTimeout(() => {
+        addNotification({
+          type: 'info',
+          title: 'Mise à jour du roster',
+          message: 'Le roster a été mis à jour automatiquement'
+        });
+      }, 2000);
+      
       onClose();
       setSelectedCharacters([]);
       setNotes('');
     } catch (error) {
       console.error('Error registering for raid:', error);
+      addNotification({
+        type: 'info',
+        title: 'Erreur',
+        message: 'Erreur lors de l\'inscription au raid'
+      });
     } finally {
       setIsLoading(false);
     }

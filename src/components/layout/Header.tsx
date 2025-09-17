@@ -2,11 +2,19 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isLoggedIn, user, logout } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  };
 
   const navigation = [
     { name: 'Accueil', href: '/' },
@@ -38,47 +46,53 @@ export default function Header() {
           </div>
 
           {/* Desktop Navigation */}
-                    <div className="hidden md:flex space-x-8">
-            <Link 
-              href="/raids" 
-              className={`${pathname === '/raids' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
-            >
-              Raids
-            </Link>
-            <Link 
-              href="/characters" 
-              className={`${pathname === '/characters' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
-            >
-              Mes Personnages
-            </Link>
-            <Link 
-              href="/roster" 
-              className={`${pathname === '/roster' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
-            >
-              Roster
-            </Link>
-            <Link 
-              href="/notifications" 
-              className={`${pathname === '/notifications' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-700 hover:text-blue-600'} pb-1 transition-colors`}
-            >
-              Notifications
-            </Link>
+          <div className="hidden md:flex space-x-8">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className={`${
+                  isActivePath(item.href)
+                    ? 'text-blue-400 border-b-2 border-blue-400'
+                    : 'text-gray-300 hover:text-white'
+                } pb-1 transition-colors`}
+              >
+                {item.name}
+              </Link>
+            ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop Auth Section */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link
-              href="/login"
-              className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Connexion
-            </Link>
-            <Link
-              href="/register"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              S&apos;inscrire
-            </Link>
+            {isLoggedIn && user ? (
+              <div className="flex items-center space-x-4">
+                <div className="text-right">
+                  <div className="text-white font-medium">{user.name}</div>
+                  <div className="text-gray-300 text-sm">{user.role}</div>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  Déconnexion
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  S&apos;inscrire
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -121,22 +135,42 @@ export default function Header() {
               </Link>
             ))}
             
-            {/* Mobile Auth Buttons */}
+            {/* Mobile Auth Section */}
             <div className="border-t border-gray-700 pt-4 mt-4">
-              <Link
-                href="/login"
-                className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Connexion
-              </Link>
-              <Link
-                href="/register"
-                className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 mt-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                S&apos;inscrire
-              </Link>
+              {isLoggedIn && user ? (
+                <div className="space-y-2">
+                  <div className="px-3 py-2">
+                    <div className="text-white font-medium">{user.name}</div>
+                    <div className="text-gray-300 text-sm">{user.role}</div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                  >
+                    Déconnexion
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:text-white hover:bg-gray-700"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600 text-white hover:bg-blue-700 mt-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    S&apos;inscrire
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

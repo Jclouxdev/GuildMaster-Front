@@ -259,114 +259,145 @@ export const mockCharacters: Character[] = [
   }
 ];
 
-// Mock raids data
+// Mock raids data - Données réalistes pour la démo
 export const mockRaids: Raid[] = [
   {
     id: '1',
-    name: 'Aberrus Heroic Clear',
-    description: 'Weekly heroic clear of Aberrus. All roles needed, good teamwork required.',
-    objective: 'Clear all bosses in Aberrus on Heroic difficulty',
-    date: new Date('2025-08-20T19:00:00'),
-    duration: 180, // 3 hours
-    maxPlayers: 20,
+    name: 'Raid Heroïque - Nerub-ar Palace',
+    description: 'Premier run héroïque de Nerub-ar, prévoir stuff 470+ iLevel. Points à réviser: Queen Ansurek.',
+    objective: 'Clear complet héroïque pour progression mythique',
+    instance: 'Nerub-ar Palace',
     difficulty: 'Heroic',
-    instance: 'Aberrus, the Shadowed Crucible',
+    date: new Date('2025-09-18T20:00:00'), // Demain soir pour la démo
+    duration: 180, // 3 heures
+    maxPlayers: 20,
+    status: 'Open',
     createdBy: '1',
-    createdAt: new Date('2025-08-15T10:00:00'),
-    updatedAt: new Date('2025-08-15T10:00:00'),
-    status: 'Open'
+    createdAt: new Date('2025-09-10T10:00:00'),
+    updatedAt: new Date('2025-09-15T15:30:00')
   },
   {
-    id: '2',
-    name: 'Vault Normal Farm',
-    description: 'Easy normal run for alts and new members. Relaxed atmosphere.',
-    date: new Date('2025-08-22T20:00:00'),
-    duration: 120, // 2 hours
-    maxPlayers: 15,
-    difficulty: 'Normal',
-    instance: 'Vault of the Incarnates',
+    id: '2', 
+    name: 'Raid Mythique - Nerub-ar Palace',
+    description: 'Progression mythique - Focus sur les 3 premiers boss. iLevel 480+ requis.',
+    objective: 'Progression mythique - viser 3/8 boss',
+    instance: 'Nerub-ar Palace',
+    difficulty: 'Mythic',
+    date: new Date('2025-09-20T19:30:00'), // Vendredi
+    duration: 240, // 4 heures
+    maxPlayers: 20,
+    status: 'Open',
     createdBy: '2',
-    createdAt: new Date('2025-08-16T14:30:00'),
-    updatedAt: new Date('2025-08-16T14:30:00'),
-    status: 'Open'
+    createdAt: new Date('2025-09-12T14:00:00'),
+    updatedAt: new Date('2025-09-16T09:15:00')
   },
   {
     id: '3',
-    name: 'Mythic Progression',
-    description: 'Mythic raid progression. Experienced raiders only.',
-    objective: 'Progress on Mythic bosses, aiming for 3/9',
-    date: new Date('2025-08-25T18:30:00'),
-    duration: 240, // 4 hours
-    maxPlayers: 20,
-    difficulty: 'Mythic',
-    instance: 'Aberrus, the Shadowed Crucible',
-    createdBy: '1',
-    createdAt: new Date('2025-08-17T09:15:00'),
-    updatedAt: new Date('2025-08-17T09:15:00'),
-    status: 'Open'
+    name: 'Initiation Donjon - Ara-Kara',
+    description: 'Session d\'initiation pour les nouveaux membres. Pas d\'iLevel requis.',
+    objective: 'Apprendre les mécaniques de base',
+    instance: 'Ara-Kara, City of Echoes',
+    difficulty: 'Normal',
+    date: new Date('2025-09-19T21:00:00'), // Jeudi  
+    duration: 90,
+    maxPlayers: 5,
+    status: 'Open',
+    createdBy: '2',
+    createdAt: new Date('2025-09-14T16:30:00'),
+    updatedAt: new Date('2025-09-14T16:30:00')
   },
   {
     id: '4',
-    name: 'Learning Raid',
-    description: 'Teaching raid for new members to learn mechanics.',
-    objective: 'Learn raid mechanics and teamwork',
-    date: new Date('2025-08-24T16:00:00'),
-    duration: 150, // 2.5 hours
-    maxPlayers: 12,
-    difficulty: 'Normal',
-    instance: 'Amirdrassil, the Dream\'s Hope',
-    createdBy: '2',
-    createdAt: new Date('2025-08-18T11:00:00'),
-    updatedAt: new Date('2025-08-18T11:00:00'),
-    status: 'Open'
+    name: 'Farm Héroïque - Contenu Antérieur',
+    description: 'Farm rapide des anciens raids pour transmog et achievements',
+    objective: 'Collecte de transmog et mounts',
+    instance: 'Vault of the Incarnates', 
+    difficulty: 'Heroic',
+    date: new Date('2025-09-21T14:00:00'), // Samedi après-midi
+    duration: 120,
+    maxPlayers: 30,
+    status: 'Open',
+    createdBy: '1', 
+    createdAt: new Date('2025-09-13T11:00:00'),
+    updatedAt: new Date('2025-09-13T11:00:00')
   }
 ];
 
-// Mock raid registrations
+// Mock raid registrations - Inscriptions réalistes pour démo
 export const mockRaidRegistrations: RaidRegistration[] = [
+  // Inscriptions pour le raid de demain (Heroïque Nerub-ar Palace)
   {
     id: '1',
     raidId: '1',
     userId: '1',
-    userName: 'John Doe',
-    characterIds: ['1', '2'],
+    userName: 'Thorgar',
+    characterIds: ['1'],
     selectedCharacterId: '1',
     status: 'Accepted',
-    registeredAt: new Date('2025-08-15T12:00:00'),
-    updatedAt: new Date('2025-08-16T10:00:00'),
-    notes: 'Leading the raid'
+    registeredAt: new Date('2025-09-15T12:00:00'),
+    updatedAt: new Date('2025-09-16T10:00:00'),
+    notes: 'Main tank, je lead le raid'
   },
   {
     id: '2',
     raidId: '1',
     userId: '2',
-    userName: 'Jane Smith',
-    characterIds: ['3', '5'],
+    userName: 'Lyralei',
+    characterIds: ['3'],
     selectedCharacterId: '3',
     status: 'Accepted',
-    registeredAt: new Date('2025-08-15T13:30:00'),
-    updatedAt: new Date('2025-08-16T10:00:00')
+    registeredAt: new Date('2025-09-15T13:30:00'),
+    updatedAt: new Date('2025-09-16T10:00:00'),
+    notes: 'DPS Hunter, stuff 475 iLevel'
   },
   {
     id: '3',
     raidId: '1',
     userId: '3',
-    userName: 'Bob Wilson',
+    userName: 'Jaina',
     characterIds: ['4'],
-    status: 'Pending',
-    registeredAt: new Date('2025-08-16T09:15:00'),
-    updatedAt: new Date('2025-08-16T09:15:00')
+    selectedCharacterId: '4',
+    status: 'Accepted',
+    registeredAt: new Date('2025-09-16T09:15:00'),
+    updatedAt: new Date('2025-09-16T09:15:00'),
+    notes: 'Heal principal'
   },
+  // Inscriptions pour le mythique
   {
     id: '4',
     raidId: '2',
-    userId: '2',
-    userName: 'Jane Smith',
-    characterIds: ['5'],
-    selectedCharacterId: '5',
+    userId: '1',
+    userName: 'Thorgar',
+    characterIds: ['1'],
+    selectedCharacterId: '1',
     status: 'Accepted',
-    registeredAt: new Date('2025-08-16T15:00:00'),
-    updatedAt: new Date('2025-08-17T10:00:00')
+    registeredAt: new Date('2025-09-12T14:30:00'),
+    updatedAt: new Date('2025-09-16T10:00:00')
+  },
+  {
+    id: '5',
+    raidId: '2',
+    userId: '2',
+    userName: 'Lyralei',
+    characterIds: ['3'],
+    selectedCharacterId: '3',
+    status: 'Pending',
+    registeredAt: new Date('2025-09-16T20:00:00'),
+    updatedAt: new Date('2025-09-16T20:00:00'),
+    notes: 'En attente de validation iLevel'
+  },
+  // Inscription pour l'initiation
+  {
+    id: '6',
+    raidId: '3',
+    userId: '3',
+    userName: 'Jaina',
+    characterIds: ['4'],
+    selectedCharacterId: '4',
+    status: 'Accepted',
+    registeredAt: new Date('2025-09-14T17:00:00'),
+    updatedAt: new Date('2025-09-14T17:00:00'),
+    notes: 'J\'aide pour l\'encadrement'
   }
 ];
 

@@ -2,22 +2,54 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { login } = useAuth();
+
+  // Comptes de démo
+  const demoAccounts = [
+    { email: 'guildmaster@demo.com', password: 'demo123', role: 'Guild Master', name: 'Thorgar' },
+    { email: 'member@demo.com', password: 'demo123', role: 'Membre', name: 'Lyralei' },
+    { email: 'officer@demo.com', password: 'demo123', role: 'Officier', name: 'Jaina' }
+  ];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Implement login logic
     console.log('Login attempt:', { email, password });
     
-    // Simulate API call
+    // Vérifier si c'est un compte de démo
+    const account = demoAccounts.find(acc => acc.email === email && acc.password === password);
+    
+    // Simulation d'authentification pour démo
     setTimeout(() => {
       setIsLoading(false);
+      if (account) {
+        login(account.email, account.name, account.role);
+      } else {
+        // Pour la démo, on peut créer un utilisateur par défaut
+        login(email, 'Utilisateur', 'Membre');
+      }
+      router.push('/raids');
+    }, 1500);
+  };
+
+  const handleDemoLogin = (account: typeof demoAccounts[0]) => {
+    setEmail(account.email);
+    setPassword(account.password);
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      setIsLoading(false);
+      login(account.email, account.name, account.role);
+      router.push('/raids');
     }, 1000);
   };
 
@@ -103,6 +135,39 @@ export default function LoginPage() {
             </button>
           </div>
         </form>
+
+        {/* Section démo */}
+        <div className="mt-6">
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-gray-50 text-gray-500">Comptes de démo</span>
+            </div>
+          </div>
+          
+          <div className="mt-4 space-y-2">
+            {demoAccounts.map((account, index) => (
+              <button
+                key={index}
+                onClick={() => handleDemoLogin(account)}
+                disabled={isLoading}
+                className="w-full text-left p-3 border border-gray-200 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">{account.name}</p>
+                    <p className="text-xs text-gray-500">{account.role}</p>
+                  </div>
+                  <div className="text-xs text-gray-400">
+                    {account.email}
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

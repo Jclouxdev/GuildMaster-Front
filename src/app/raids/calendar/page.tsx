@@ -1,15 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { mockRaids } from '@/lib/mockData';
+import { useRaidStore } from '@/lib/raidStore';
 import { Raid } from '@/types/raid';
 import CalendarView from '@/components/raids/CalendarView';
 import RaidFilters from '@/components/raids/RaidFilters';
 
 export default function RaidCalendarPage() {
-  const [raids] = useState<Raid[]>(mockRaids);
-  const [filteredRaids, setFilteredRaids] = useState<Raid[]>(mockRaids);
+  const { raids, loadInitialData } = useRaidStore();
+  const [filteredRaids, setFilteredRaids] = useState<Raid[]>([]);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
+  useEffect(() => {
+    setFilteredRaids(raids);
+  }, [raids]);
 
   const handleFilterChange = (filters: {
     difficulty?: string;

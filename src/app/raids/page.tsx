@@ -1,17 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { mockRaids, getRegistrationsByRaidId } from '@/lib/mockData';
+import { getRegistrationsByRaidId } from '@/lib/mockData';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/components/providers/NotificationProvider';
 import { Raid } from '@/types/raid';
 import RaidCard from '@/components/raids/RaidCard';
 import RaidFilters from '@/components/raids/RaidFilters';
 import CalendarView from '@/components/raids/CalendarView';
+import { useRaidStore } from '@/lib/raidStore';
 
 export default function RaidsPage() {
-  const [raids] = useState<Raid[]>(mockRaids);
-  const [filteredRaids, setFilteredRaids] = useState<Raid[]>(mockRaids);
+  const { user } = useAuth();
+  const { addNotification } = useNotifications();
+  const { raids, addParticipant, loadInitialData } = useRaidStore();
+  const [filteredRaids, setFilteredRaids] = useState<Raid[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
+
+  useEffect(() => {
+    setFilteredRaids(raids);
+  }, [raids]);
 
   const handleFilterChange = (filters: {
     difficulty?: string;
@@ -47,6 +60,34 @@ export default function RaidsPage() {
 
   const getRaidParticipantCount = (raidId: string) => {
     return getRegistrationsByRaidId(raidId).length;
+  };
+
+  const handleJoinRaid = (raidId: string) => {
+    // Trouver le raid pour obtenir son nom pour la notification
+    const raid = raids.find(r => r.id === raidId);
+    
+    // Utiliser les données de l'utilisateur connecté ou des valeurs par défaut pour la démo
+    const currentUser = user || { name: 'Joueur Demo', email: 'demo@example.com' };
+    
+    const newParticipant = {
+      playerId: '1', // ID du joueur connecté (pour la démo)
+      playerName: currentUser.name,
+      characterId: '1',
+      characterName: 'MonPersonnage',
+      characterClass: 'Paladin' as const,
+      characterLevel: 80,
+      role: 'Tank' as const,
+      status: 'Confirmed' as const
+    };
+    
+    addParticipant(raidId, newParticipant);
+    
+    // Afficher la notification de confirmation
+    addNotification({
+      type: 'registration',
+      title: 'Inscription réussie !',
+      message: `Vous vous êtes inscrit(e) au raid ${raid ? `"${raid.name}"` : ''}`
+    });
   };
 
   return (
@@ -113,6 +154,7 @@ export default function RaidsPage() {
                   key={raid.id}
                   raid={raid}
                   participantCount={getRaidParticipantCount(raid.id)}
+                  onJoinRaid={handleJoinRaid}
                 />
               ))
             )}

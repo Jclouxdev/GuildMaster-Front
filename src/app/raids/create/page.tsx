@@ -3,9 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreateRaidData } from '@/types/raid';
+import { useNotifications } from '@/components/providers/NotificationProvider';
+import { useRaidStore } from '@/lib/raidStore';
 
 export default function CreateRaidPage() {
   const router = useRouter();
+  const { addNotification } = useNotifications();
+  const { addRaid } = useRaidStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<CreateRaidData>({
     name: '',
@@ -17,6 +21,10 @@ export default function CreateRaidPage() {
     difficulty: 'Normal',
     instance: ''
   });
+
+  // Classes communes pour les champs de formulaire
+  const inputClasses = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500 bg-white";
+  const selectClasses = "w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -35,16 +43,33 @@ export default function CreateRaidPage() {
     setIsLoading(true);
 
     try {
-      // TODO: Implement API call to create raid
       console.log('Creating raid:', formData);
       
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Ajouter le raid au store
+      addRaid({
+        ...formData,
+        status: 'Open' as const
+      });
+      
+      // Notification de succès pour la démo
+      addNotification({
+        type: 'info',
+        title: 'Raid créé avec succès !',
+        message: `Le raid "${formData.name}" a été planifié pour le ${formData.date.toLocaleDateString()}`
+      });
       
       // Redirect to raids page
       router.push('/raids');
     } catch (error) {
       console.error('Error creating raid:', error);
+      addNotification({
+        type: 'info',
+        title: 'Erreur',
+        message: 'Une erreur est survenue lors de la création du raid'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -82,7 +107,7 @@ export default function CreateRaidPage() {
                   required
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className={inputClasses}
                   placeholder="Ex: Aberrus Heroic Clear"
                 />
               </div>
@@ -97,7 +122,7 @@ export default function CreateRaidPage() {
                   required
                   value={formData.instance}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className={selectClasses}
                 >
                   <option value="">Sélectionner une instance</option>
                   <option value="Aberrus, the Shadowed Crucible">Aberrus, the Shadowed Crucible</option>
@@ -152,7 +177,7 @@ export default function CreateRaidPage() {
                   required
                   value={formatDateForInput(formData.date)}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className={inputClasses}
                 />
               </div>
 
@@ -186,7 +211,7 @@ export default function CreateRaidPage() {
                   required
                   value={formData.difficulty}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className={selectClasses}
                 >
                   <option value="Normal">Normal</option>
                   <option value="Heroic">Héroïque</option>

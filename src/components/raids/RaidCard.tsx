@@ -6,9 +6,10 @@ import { Raid } from '@/types/raid';
 interface RaidCardProps {
   raid: Raid;
   participantCount: number;
+  onJoinRaid?: (raidId: string) => void;
 }
 
-export default function RaidCard({ raid, participantCount }: RaidCardProps) {
+export default function RaidCard({ raid, participantCount, onJoinRaid }: RaidCardProps) {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'Normal': return 'bg-green-100 text-green-800';
@@ -29,7 +30,14 @@ export default function RaidCard({ raid, participantCount }: RaidCardProps) {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
+    const dateObject = typeof date === 'string' ? new Date(date) : date;
+    
+    // Vérifier si la date est valide
+    if (isNaN(dateObject.getTime())) {
+      return 'Date invalide';
+    }
+    
     return new Intl.DateTimeFormat('fr-FR', {
       weekday: 'long',
       year: 'numeric',
@@ -37,7 +45,7 @@ export default function RaidCard({ raid, participantCount }: RaidCardProps) {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
-    }).format(date);
+    }).format(dateObject);
   };
 
   const formatDuration = (minutes: number) => {
@@ -111,7 +119,10 @@ export default function RaidCard({ raid, participantCount }: RaidCardProps) {
         
         <div className="flex items-center gap-2">
           {canJoin ? (
-            <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+            <button 
+              onClick={() => onJoinRaid?.(raid.id)}
+              className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors"
+            >
               S&apos;inscrire
             </button>
           ) : isRaidFull ? (

@@ -3,17 +3,28 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { getRaidById, getParticipantsByRaidId } from '@/lib/mockData';
+import { useRaidStore } from '@/lib/raidStore';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNotifications } from '@/components/providers/NotificationProvider';
 import { Raid, RaidParticipant } from '@/types/raid';
 
 export default function RaidDetailPage() {
   const params = useParams();
+  const { user } = useAuth();
+  const { addNotification } = useNotifications();
+  const { getRaidById, getParticipantsByRaidId, addParticipant, loadInitialData } = useRaidStore();
   const [raid, setRaid] = useState<Raid | null>(null);
   const [participants, setParticipants] = useState<RaidParticipant[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // S'assurer que les données sont chargées
+    loadInitialData();
+  }, [loadInitialData]);
+
+  useEffect(() => {
     const raidId = params.id as string;
+    // Utiliser la méthode du store qui cherche dans tous les raids (mocks + nouveaux)
     const foundRaid = getRaidById(raidId);
     const raidParticipants = getParticipantsByRaidId(raidId);
 
@@ -22,7 +33,36 @@ export default function RaidDetailPage() {
       setParticipants(raidParticipants);
     }
     setIsLoading(false);
-  }, [params.id]);
+  }, [params.id, getRaidById, getParticipantsByRaidId]);
+
+  const handleJoinRaid = () => {
+    if (!raid) return;
+    
+    // Utiliser les données de l'utilisateur connecté ou des valeurs par défaut pour la démo
+    const currentUser = user || { name: 'Joueur Demo', email: 'demo@example.com' };
+    
+    const newParticipant = {
+      playerId: '1', // ID du joueur connecté (pour la démo)
+      playerName: currentUser.name,
+      characterId: '1',
+      characterName: 'MonPersonnage',
+      characterClass: 'Paladin' as const,
+      characterLevel: 80,
+      role: 'Tank' as const,
+      status: 'Confirmed' as const
+    };
+    
+    addParticipant(raid.id, newParticipant);
+    // Rafraîchir la liste des participants
+    setParticipants(getParticipantsByRaidId(raid.id));
+    
+    // Afficher la notification de confirmation
+    addNotification({
+      type: 'registration',
+      title: 'Inscription réussie !',
+      message: `Vous vous êtes inscrit(e) au raid "${raid.name}"`
+    });
+  };
 
   if (isLoading) {
     return (
@@ -145,7 +185,10 @@ export default function RaidDetailPage() {
                 Éditer
               </Link>
               {canJoin && (
-                <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                <button 
+                  onClick={handleJoinRaid}
+                  className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
+                >
                   S&apos;inscrire
                 </button>
               )}
