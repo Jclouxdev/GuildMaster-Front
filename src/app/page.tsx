@@ -17,11 +17,11 @@ export default function HomePage() {
       linkText: 'Gérer le roster'
     },
     {
-      icon: '🔔',
-      title: 'Notifications',
-      description: 'Recevez des notifications en temps réel pour les inscriptions, modifications de raids et événements importants.',
-      link: '/notifications',
-      linkText: 'Notifications'
+      icon: '�',
+      title: 'Personnages',
+      description: 'Gérez vos personnages, suivez leurs équipements et optimisez leurs builds pour les raids.',
+      link: '/characters',
+      linkText: 'Mes personnages'
     },
     {
       icon: '⚙️',

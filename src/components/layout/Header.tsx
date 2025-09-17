@@ -21,7 +21,6 @@ export default function Header() {
     { name: 'Raids', href: '/raids' },
     { name: 'Mes Personnages', href: '/characters' },
     { name: 'Calendrier', href: '/raids/calendar' },
-    { name: 'Roster', href: '/roster' },
     { name: 'Notifications', href: '/notifications' },
   ];
 

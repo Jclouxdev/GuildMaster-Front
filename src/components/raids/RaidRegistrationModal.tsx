@@ -1,15 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { Character } from '@/types/raid';
 import { useNotifications } from '../providers/NotificationProvider';
+import { useCharacterStore } from '@/lib/characterStore';
 
 interface RaidRegistrationModalProps {
   isOpen: boolean;
   onClose: () => void;
   raidId: string;
   raidName: string;
-  userCharacters: Character[];
   onRegister: (characterIds: string[], notes?: string) => void;
 }
 
@@ -17,10 +16,15 @@ export default function RaidRegistrationModal({
   isOpen,
   onClose,
   raidName,
-  userCharacters,
   onRegister
 }: RaidRegistrationModalProps) {
   const { addNotification } = useNotifications();
+  const { getUserCharacters } = useCharacterStore();
+  
+  // Pour la démo, on utilise l'utilisateur ID '1'
+  const currentUserId = '1';
+  const userCharacters = getUserCharacters(currentUserId);
+  
   const [selectedCharacters, setSelectedCharacters] = useState<string[]>([]);
   const [notes, setNotes] = useState('');
   const [isLoading, setIsLoading] = useState(false);

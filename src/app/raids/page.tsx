@@ -3,24 +3,33 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { getRegistrationsByRaidId } from '@/lib/mockData';
-import { useAuth } from '@/contexts/AuthContext';
 import { useNotifications } from '@/components/providers/NotificationProvider';
 import { Raid } from '@/types/raid';
 import RaidCard from '@/components/raids/RaidCard';
 import RaidFilters from '@/components/raids/RaidFilters';
 import CalendarView from '@/components/raids/CalendarView';
+import RaidRegistrationModal from '@/components/raids/RaidRegistrationModal';
 import { useRaidStore } from '@/lib/raidStore';
+import { useCharacterStore } from '@/lib/characterStore';
 
 export default function RaidsPage() {
-  const { user } = useAuth();
   const { addNotification } = useNotifications();
   const { raids, addParticipant, loadInitialData } = useRaidStore();
+  const { getUserCharacters, getMainCharacter, loadInitialData: loadCharacters } = useCharacterStore();
+  
   const [filteredRaids, setFilteredRaids] = useState<Raid[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [registrationModal, setRegistrationModal] = useState<{ isOpen: boolean; raidId?: string; raidName?: string }>({
+    isOpen: false
+  });
+
+  // Pour la démo, on utilise l'utilisateur ID '1'
+  const currentUserId = '1';
 
   useEffect(() => {
     loadInitialData();
-  }, [loadInitialData]);
+    loadCharacters();
+  }, [loadInitialData, loadCharacters]);
 
   useEffect(() => {
     setFilteredRaids(raids);
@@ -63,30 +72,57 @@ export default function RaidsPage() {
   };
 
   const handleJoinRaid = (raidId: string) => {
-    // Trouver le raid pour obtenir son nom pour la notification
+    // Trouver le raid pour obtenir son nom
     const raid = raids.find(r => r.id === raidId);
-    
-    // Utiliser les données de l'utilisateur connecté ou des valeurs par défaut pour la démo
-    const currentUser = user || { name: 'Joueur Demo', email: 'demo@example.com' };
-    
+    if (!raid) return;
+
+    // Ouvrir la modal d'inscription
+    setRegistrationModal({
+      isOpen: true,
+      raidId: raidId,
+      raidName: raid.name
+    });
+  };
+
+  const handleRaidRegistration = (characterIds: string[], notes?: string) => {
+    const { raidId } = registrationModal;
+    if (!raidId) return;
+
+    // Pour une démo simple, on utilise le personnage principal ou le premier disponible
+    const userCharacters = getUserCharacters(currentUserId);
+    const mainCharacter = getMainCharacter(currentUserId);
+    const selectedCharacter = mainCharacter || userCharacters[0];
+
+    if (!selectedCharacter) {
+      addNotification({
+        type: 'info',
+        title: 'Aucun personnage',
+        message: 'Vous devez créer un personnage avant de vous inscrire à un raid.'
+      });
+      return;
+    }
+
     const newParticipant = {
-      playerId: '1', // ID du joueur connecté (pour la démo)
-      playerName: currentUser.name,
-      characterId: '1',
-      characterName: 'MonPersonnage',
-      characterClass: 'Paladin' as const,
-      characterLevel: 80,
-      role: 'Tank' as const,
+      playerId: currentUserId,
+      playerName: 'Joueur Demo', // Simplifié pour la démo
+      characterId: selectedCharacter.id,
+      characterName: selectedCharacter.name,
+      characterClass: selectedCharacter.class,
+      characterLevel: selectedCharacter.level,
+      role: selectedCharacter.primaryRole,
       status: 'Confirmed' as const
     };
     
     addParticipant(raidId, newParticipant);
     
-    // Afficher la notification de confirmation
+    // Fermer la modal et afficher la notification
+    setRegistrationModal({ isOpen: false });
+    
+    const raid = raids.find(r => r.id === raidId);
     addNotification({
       type: 'registration',
       title: 'Inscription réussie !',
-      message: `Vous vous êtes inscrit(e) au raid ${raid ? `"${raid.name}"` : ''}`
+      message: `Vous vous êtes inscrit(e) au raid "${raid?.name || ''}" avec ${selectedCharacter.name}`
     });
   };
 
@@ -162,6 +198,15 @@ export default function RaidsPage() {
         ) : (
           <CalendarView raids={filteredRaids} />
         )}
+
+        {/* Modal d'inscription */}
+        <RaidRegistrationModal
+          isOpen={registrationModal.isOpen}
+          onClose={() => setRegistrationModal({ isOpen: false })}
+          raidId={registrationModal.raidId || ''}
+          raidName={registrationModal.raidName || ''}
+          onRegister={handleRaidRegistration}
+        />
       </div>
     </div>
   );
