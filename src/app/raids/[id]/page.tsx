@@ -178,6 +178,15 @@ export default function RaidDetailPage() {
               <p className="text-gray-600 text-lg">{raid.description}</p>
             </div>
             <div className="flex gap-2">
+              {(user?.role === 'Guild Master' || user?.role === 'Officer') && (
+                <Link
+                  href={`/raids/${raid.id}/roster`}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 flex items-center gap-2"
+                >
+                  <span>👥</span>
+                  Gérer le Roster
+                </Link>
+              )}
               <Link
                 href={`/raids/${raid.id}/edit`}
                 className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700"

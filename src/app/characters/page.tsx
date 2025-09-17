@@ -1,42 +1,55 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Character, WowClass } from '@/types/raid';
-import { WOW_CLASSES_DATA, MASTERY_LEVELS, mockCharacters } from '@/lib/mockData';
+import { WOW_CLASSES_DATA, MASTERY_LEVELS } from '@/lib/mockData';
+import { useCharacterStore } from '@/lib/characterStore';
 import CharacterForm from '@/components/characters/CharacterForm';
 
 export default function CharactersPage() {
-  const [characters, setCharacters] = useState<Character[]>(mockCharacters);
+  const {
+    addCharacter,
+    updateCharacter,
+    deleteCharacter,
+    setMainCharacter,
+    getUserCharacters,
+    loadInitialData
+  } = useCharacterStore();
+  
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
+  
+  // Pour la démo, on utilise l'utilisateur ID '1'
+  const currentUserId = '1';
+  const userCharacters = getUserCharacters(currentUserId);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   const handleSaveCharacter = (characterData: Partial<Character>) => {
     if (editingCharacter) {
       // Update existing character
-      setCharacters(characters.map(c => 
-        c.id === editingCharacter.id 
-          ? { ...editingCharacter, ...characterData } as Character
-          : c
-      ));
+      updateCharacter(editingCharacter.id, characterData);
       setEditingCharacter(null);
     } else {
       // Add new character
-      const newCharacter = {
+      addCharacter({
         ...characterData,
-        id: crypto.randomUUID(),
-        userId: '1', // Mock user ID
-        createdAt: new Date(),
-        updatedAt: new Date()
-      } as Character;
-      setCharacters([...characters, newCharacter]);
+        userId: currentUserId, // Associer au user actuel
+      } as Omit<Character, 'id' | 'createdAt' | 'updatedAt'>);
       setShowAddForm(false);
     }
   };
 
   const handleDeleteCharacter = (characterId: string) => {
     if (confirm('Êtes-vous sûr de vouloir supprimer ce personnage ?')) {
-      setCharacters(characters.filter(c => c.id !== characterId));
+      deleteCharacter(characterId);
     }
+  };
+
+  const handleSetMainCharacter = (characterId: string) => {
+    setMainCharacter(characterId);
   };
 
   const getRoleColor = (role: 'Tank' | 'Healer' | 'DPS') => {
@@ -91,18 +104,18 @@ export default function CharactersPage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <div className="text-2xl font-bold text-blue-600">{characters.length}</div>
+              <div className="text-2xl font-bold text-blue-600">{userCharacters.length}</div>
               <div className="text-sm text-gray-600">Personnages total</div>
             </div>
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-green-600">
-                {characters.filter(c => c.isMain).length}
+                {userCharacters.filter(c => c.isMain).length}
               </div>
               <div className="text-sm text-gray-600">Personnages principaux</div>
             </div>
             <div className="bg-purple-50 p-4 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">
-                {characters.reduce((acc, c) => acc + c.specializations.length, 0)}
+                {userCharacters.reduce((acc, c) => acc + c.specializations.length, 0)}
               </div>
               <div className="text-sm text-gray-600">Spécialisations total</div>
             </div>
@@ -111,7 +124,7 @@ export default function CharactersPage() {
 
         {/* Characters Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {characters.map((character) => (
+          {userCharacters.map((character) => (
             <div key={character.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
               {/* Character Header */}
               <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-4 text-white">
@@ -163,6 +176,21 @@ export default function CharactersPage() {
 
               {/* Character Content */}
               <div className="p-4">
+                {/* Main Character Toggle */}
+                {!character.isMain && (
+                  <div className="mb-4">
+                    <button
+                      onClick={() => handleSetMainCharacter(character.id)}
+                      className="w-full bg-yellow-50 hover:bg-yellow-100 text-yellow-700 border border-yellow-200 px-3 py-2 rounded-lg font-medium transition-colors flex items-center justify-center"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                      Définir comme personnage principal
+                    </button>
+                  </div>
+                )}
+
                 {/* Primary Role */}
                 <div className="mb-4">
                   <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(character.primaryRole)}`}>
@@ -215,7 +243,7 @@ export default function CharactersPage() {
         </div>
 
         {/* Empty State */}
-        {characters.length === 0 && (
+        {userCharacters.length === 0 && (
           <div className="text-center py-12">
             <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
