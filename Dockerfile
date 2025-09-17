@@ -41,11 +41,7 @@ USER nextjs
 
 EXPOSE 3000
 
-USER nextjs
-
-EXPOSE $PORT
-
 ENV HOSTNAME "0.0.0.0"
 
-# Utilise le PORT fourni par Railway, sinon 3000 par défaut
-CMD ["sh", "-c", "node server.js"]
+# Utilise le PORT fourni par Railway au runtime
+CMD ["sh", "-c", "PORT=${PORT:-3000} node server.js"]
